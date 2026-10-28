@@ -1,0 +1,86 @@
+name: VentureLens CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+env:
+  NEXT_TELEMETRY_DISABLED: 1
+  DATABASE_URL: postgresql://build:build@127.0.0.1:5432/build?schema=venturelens
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run db:generate
+      - run: npm run lint:all
+      - run: npm run test:coverage
+      - run: npm run build:all
+  e2e:
+    runs-on: ubuntu-latest
+    needs: quality
+    services:
+      postgres:
+        image: postgres:17-bookworm
+        env:
+          POSTGRES_USER: venturelens
+          POSTGRES_PASSWORD: development-only-password
+          POSTGRES_DB: venturelens
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U venturelens -d venturelens"
+          --health-interval 5s --health-timeout 3s --health-retries 10
+    env:
+      DATABASE_URL: postgresql://venturelens:development-only-password@127.0.0.1:5432/venturelens?schema=venturelens
+      MIGRATION_DATABASE_URL: postgresql://venturelens:development-only-password@127.0.0.1:5432/venturelens?schema=venturelens
+      BOOTSTRAP_ADMIN_USERNAME: admin
+      BOOTSTRAP_ADMIN_PASSWORD: development-only-password
+      BOOTSTRAP_ADMIN_FULL_NAME: Test Administrator
+      TEST_USERNAME: admin
+      TEST_PASSWORD: development-only-password
+      CI: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run db:generate
+      - run: npx playwright install --with-deps chromium
+      - run: npm run db:deploy
+      - run: npm run db:seed
+      - run: npm run build
+      - run: npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report
+          retention-days: 7
+  docker:
+    runs-on: ubuntu-latest
+    needs: quality
+    strategy:
+      matrix:
+        target: [web, worker, migrate]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          target: ${{ matrix.target }}
+          push: false
+          tags: venturelens-${{ matrix.target }}:ci
+          cache-from: type=gha,scope=${{ matrix.target }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.target }}

@@ -1,0 +1,39 @@
+# Foundation implementation status
+
+**Updated:** 2026-10-28. The boilerplate installation and adaptation milestone is complete. This is a development starting point, not a completed VentureLens MVP or confidential-production release.
+
+## Installed/adapted
+
+- Pinned starter application, local UI kit, Persian utilities, validation/service/action pattern, unit and browser test scaffolding.
+- VentureLens identity, Persian-only dictionary, light design tokens from the supplied reference, local Vazirmatn fallback, retained administrator account UI.
+- Demo gallery, theme controls, second UI dictionary, unsafe module generator, template setup/issue-tracker/Claude-specific configuration removed from the active project.
+- Canonical specifications in `docs/`, product PRD, agent instructions, preserved original design reference, historical documents and upstream ADRs.
+- Dedicated `venturelens` migration schema, separate migration launcher, explicit first-admin credentials, no default production password.
+- Web/worker/migrator Docker targets; worker process scaffold and explicit health endpoints. These are packaging assets, not proof of an executed Docker build.
+- Docker-free local PostgreSQL 17.10 launcher on Windows, with data under ignored `.local/postgres`; the Compose database remains optional.
+
+## Must complete before a confidential hosted pilot
+
+- Hosted authentication specification: persistent username/IP throttles, idle sessions, authVersion race protection, forced password change/recent-auth flows, atomic account changes, final-admin serialization, and audit coverage. Starter memory throttling and account behavior are not that implementation.
+- Real Supabase role/grant configuration, TLS verification, migration tests, Storage adapter/buckets/quota controls, independent backups and restore journal.
+- Entire Startup/Assessment model and business workflows, parsers, evidence/selection, scoring/rubric approval, durable queue/fencing, AI integration and cost controls, review/approval/report/purge features.
+- Docker build/run and actual Darkube acceptance, private registry configuration, image digest/SBOM checks, operational monitoring.
+- Resolve or explicitly review the Prisma CLI dependency advisory recorded in [dependency review](dependency-review.md).
+
+## Validation record
+
+Verified on Windows with portable Node 24.22.1 and npm 11.19.1:
+
+- Dependencies installed, security patches applied, direct versions and lockfile pinned. `npm ls --depth=0` passes with no invalid dependency tree. Necessary install-script approvals are version-specific.
+- `npm run db:generate` passes for Prisma 6.19.3.
+- `npm run lint:all` passes: ESLint, RTL smoke, TypeScript, and formatting.
+- `npm run test:coverage` passes: 13 files, 142 tests; 94.51% statements and 95.38% lines in the configured coverage scope. These are starter tests with mocked database behavior, not product acceptance or transaction-concurrency evidence.
+- `npm run build:all` passes: production Next.js build and independent worker compilation.
+- Playwright using installed Microsoft Edge passes local browser checks at 1440px and 375px: Persian RTL/light rendering, keyboard focus, no horizontal overflow, no page JavaScript errors, signed-out home redirect, liveness 200, and readiness 503 without PostgreSQL. The synthetic evaluator preview redirects away from administrator routes. Screenshots were visually inspected.
+- Original `design.md` and the supplied source file have identical SHA-256: `101C5250C7A53794974DB3BD7C4CD588B870E569C07010F926CB34CE249C1F21`.
+- On 2026-10-28, local PostgreSQL 17.10 started on `127.0.0.1:5432`, created the `venturelens` database, and `npm run db:deploy` applied committed migration `0001_init` successfully to its `venturelens` schema. A local administrator has not been created; the test bootstrap command requires the normal Windows user context, which was not authorized in this session.
+- npm audit on 2026-10-23 after the starter patches: zero critical/moderate findings, three high package findings in one Prisma CLI dependency chain; see [review](dependency-review.md). The 2026-10-28 addition of the local PostgreSQL package has not been audited yet. This is not a clean security audit.
+
+**Unavailable here:** Docker is not installed; no Supabase credentials were supplied. Actual account/session flows, database-backed Playwright E2E, Docker image execution, Supabase roles/Storage, and Darkube deployment have not been exercised. The local PostgreSQL test does not establish Supabase role, TLS, or cross-provider behavior. CI is configured to run disposable-PostgreSQL E2E and build all Docker targets, but no CI run is claimed.
+
+Downloaded upstream research/archive files and obsolete template assets were removed. Portable Node/Git and npm cache remain ignored under `.tools/`. A local Git repository has been initialized on `main`; it has not been committed or connected to a GitHub remote because the GitHub integration is not connected in this session. Original root specification paths remain as links into the canonical `docs/` structure.

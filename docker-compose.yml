@@ -1,0 +1,19 @@
+# Local only; hosted persistence is Supabase.
+services:
+  db:
+    image: postgres:17-bookworm
+    environment:
+      POSTGRES_USER: venturelens
+      POSTGRES_PASSWORD: local-development-only
+      POSTGRES_DB: venturelens
+    ports:
+      - '127.0.0.1:5432:5432'
+    volumes:
+      - venturelens-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U venturelens -d venturelens']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+volumes:
+  venturelens-db:
