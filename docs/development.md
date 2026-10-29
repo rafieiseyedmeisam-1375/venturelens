@@ -22,7 +22,7 @@ Set the three `BOOTSTRAP_ADMIN_*` values privately, then run `npm run db:seed` o
 6. Create private `originals` and `artifacts` buckets for the forthcoming storage adapter. S3 keys bypass Storage RLS across the project; do not send them to a browser or parser. Store credentials only after that adapter is implemented and tested.
 7. Configure independent backups, quota monitoring, and recovery before confidential files. The full [runbook](darkube-deployment.md) remains binding.
 
-No real project URL or credential has been committed. Schema SQL has only been prepared locally until actual database validation is recorded.
+No real project URL or credential has been committed. Application migrations have passed against local and disposable CI PostgreSQL; actual Supabase roles, grants, and connectivity remain unprovisioned.
 
 ## Processes and packaging
 

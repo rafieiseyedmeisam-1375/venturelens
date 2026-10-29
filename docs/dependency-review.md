@@ -1,4 +1,4 @@
-# Dependency review — 2026-10-23
+# Dependency review — 2026-10-29
 
 The application starts from upstream commit `a6228062889af58805fba519cd2c00331808893d`, then applies compatible security updates. Direct dependency versions are exact in `package.json`; `package-lock.json` records transitive versions and integrity hashes. Use `npm ci`.
 
@@ -6,10 +6,12 @@ Validated runtime: Node 24.22.1, npm 11.19.1. Main resolved versions: Next.js / 
 
 The npm advisory check after updates reports **three high-severity package findings, zero moderate, zero critical**. All three refer to one dependency chain in development/migration tooling: `prisma → @prisma/config → deepmerge-ts` ([GHSA-ggr8-5vv4-36mx](https://github.com/advisories/GHSA-ggr8-5vv4-36mx)). Recursive object graphs can exhaust the stack. Our Prisma configuration is trusted repository code, but the advisory remains unresolved. Do not load user-controlled Prisma configuration.
 
+On 2026-10-29, the fresh audit initially reported a fourth high-severity finding in `zod@4.6.5` ([GHSA-mrhx-c7xc-m3w5](https://github.com/advisories/GHSA-mrhx-c7xc-m3w5)). Updated only Zod to exact version `4.6.7`, with the resolved integrity recorded in the lockfile and install scripts disabled for this patch. The installation audit returned to the three Prisma-tooling findings above. This does not replace application input-size limits or hosted-authentication safeguards.
+
 npm proposes Prisma 7.10.1 as a breaking upgrade. That requires a separately reviewed ORM migration and real-database regression checks; it has not been forced during starter setup. Resolve or explicitly review this finding before hosted acceptance. The migration/build image contains development tooling and therefore includes this dependency. An audit result is time-specific and does not establish overall application security.
 
 The npm install-script allowlist approves only the installed versions of Prisma client/engines/CLI, esbuild, and unrs-resolver. Review scripts and refresh version-specific approvals when upgrading. No global script approval is enabled.
 
-On 2026-10-28, `embedded-postgres@17.10.0-beta.17` was added as a development dependency to run local PostgreSQL without Docker. Its Windows binary package has a version-specific install-script approval and is excluded from production images. The 2026-10-23 audit numbers above precede this addition; run a fresh audit before release decisions.
+On 2026-10-28, `embedded-postgres@17.10.0-beta.17` was added as a development dependency to run local PostgreSQL without Docker. Its Windows binary package has a version-specific install-script approval and is excluded from Linux images. The 2026-10-29 audit includes this addition. Refresh the audit before release decisions.
 
 See [third-party notices](licenses/README.md) and [implementation status](implementation-status.md) for licenses and validation boundaries.

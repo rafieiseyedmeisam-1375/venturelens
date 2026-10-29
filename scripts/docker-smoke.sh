@@ -66,7 +66,7 @@ retry http_status /api/health/live 200
 # An empty database must not be reported ready.
 retry http_status /api/health/ready 503
 
-# Deploy twice to prove that a second container start does not reset/reapply migrations.
+# Deploy twice to check that the committed migrations are repeatable.
 for attempt in 1 2; do
   docker run --rm --network "$network" \
     -e "MIGRATION_DATABASE_URL=$database_url" venturelens-migrate:ci
@@ -82,7 +82,11 @@ retry http_status /api/health/ready 503
 http_status /api/health/live 200
 
 docker stop --time 15 "$web" "$worker" >/dev/null
-for container in "$web" "$worker"; do
-  test "$(docker inspect -f '{{.State.ExitCode}}' "$container")" = 0
-done
+# Next 16.4.3 finishes its SIGTERM cleanup with 143 (start-server.js); our worker uses 0.
+# A timeout/SIGKILL (137) must fail either check.
+web_exit="$(docker inspect -f '{{.State.ExitCode}}' "$web")"
+worker_exit="$(docker inspect -f '{{.State.ExitCode}}' "$worker")"
+echo "Container exit codes: web=${web_exit} (expected 143), worker=${worker_exit} (expected 0)."
+test "$web_exit" = 143
+test "$worker_exit" = 0
 echo 'Docker smoke passed: non-root images, migrations, readiness transitions, worker startup, graceful shutdown.'
