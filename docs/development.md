@@ -36,4 +36,8 @@ No real project URL or credential has been committed. Schema SQL has only been p
 
 Unit tests mock Prisma and cannot validate real transactions. CI provisions disposable PostgreSQL, seeds synthetic credentials, builds the application, and runs Playwright against the production server. Local browser setup: `npx playwright install chromium`; set `TEST_USERNAME`/`TEST_PASSWORD` matching the isolated test account. Never point E2E user-management tests at production.
 
+The Docker job loads the `web`, `worker`, and `migrate` images and runs `bash scripts/docker-smoke.sh` on Linux. It creates its own disposable PostgreSQL container and Docker network, with no host ports or cloud credentials. Checks cover non-root images, missing-schema readiness (503), applying committed migrations twice, ready web (200), worker connectivity with processing disabled, readiness loss while liveness remains healthy after database shutdown, and graceful web/worker termination. Cleanup removes only that run's containers, database volume, and network. This verifies packaging and lifecycle, not Supabase grants/TLS or assessment-job concurrency. To run it manually with Docker and Bash, first build all three targets with tags `venturelens-web:ci`, `venturelens-worker:ci`, and `venturelens-migrate:ci`.
+
+Keep `.local/` (including local PostgreSQL data), `.env*`, `.tools/`, and `.git/` outside the Docker build context via `.dockerignore`.
+
 The generic module generator was removed because it generated routes outside the authenticated shell and destructive hard-delete defaults. Add modules manually using Users as the structural reference and the product's domain rules.

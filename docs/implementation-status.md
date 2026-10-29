@@ -9,7 +9,7 @@
 - Demo gallery, theme controls, second UI dictionary, unsafe module generator, template setup/issue-tracker/Claude-specific configuration removed from the active project.
 - Canonical specifications in `docs/`, product PRD, agent instructions, preserved original design reference, historical documents and upstream ADRs.
 - Dedicated `venturelens` migration schema, separate migration launcher, explicit first-admin credentials, no default production password.
-- Web/worker/migrator Docker targets; worker process scaffold and explicit health endpoints. These are packaging assets, not proof of an executed Docker build.
+- Web/worker/migrator Docker targets; worker process scaffold and explicit health endpoints. All three image builds passed in GitHub Actions; container execution checks are tracked separately below.
 - Docker-free local PostgreSQL 17.10 launcher on Windows, with data under ignored `.local/postgres`; the Compose database remains optional.
 
 ## Must complete before a confidential hosted pilot
@@ -17,7 +17,7 @@
 - Hosted authentication specification: persistent username/IP throttles, idle sessions, authVersion race protection, forced password change/recent-auth flows, atomic account changes, final-admin serialization, and audit coverage. Starter memory throttling and account behavior are not that implementation.
 - Real Supabase role/grant configuration, TLS verification, migration tests, Storage adapter/buckets/quota controls, independent backups and restore journal.
 - Entire Startup/Assessment model and business workflows, parsers, evidence/selection, scoring/rubric approval, durable queue/fencing, AI integration and cost controls, review/approval/report/purge features.
-- Docker build/run and actual Darkube acceptance, private registry configuration, image digest/SBOM checks, operational monitoring.
+- Docker runtime validation and actual Darkube acceptance, private registry configuration, image digest/SBOM checks, operational monitoring.
 - Resolve or explicitly review the Prisma CLI dependency advisory recorded in [dependency review](dependency-review.md).
 
 ## Validation record
@@ -34,6 +34,9 @@ Verified on Windows with portable Node 24.22.1 and npm 11.19.1:
 - On 2026-10-28, local PostgreSQL 17.10 started on `127.0.0.1:5432`, created the `venturelens` database, and `npm run db:deploy` applied committed migration `0001_init` successfully to its `venturelens` schema. A local administrator has not been created; the test bootstrap command requires the normal Windows user context, which was not authorized in this session.
 - npm audit on 2026-10-23 after the starter patches: zero critical/moderate findings, three high package findings in one Prisma CLI dependency chain; see [review](dependency-review.md). The 2026-10-28 addition of the local PostgreSQL package has not been audited yet. This is not a clean security audit.
 
-**Unavailable here:** Docker is not installed; no Supabase credentials were supplied. Actual account/session flows, database-backed Playwright E2E, Docker image execution, Supabase roles/Storage, and Darkube deployment have not been exercised. The local PostgreSQL test does not establish Supabase role, TLS, or cross-provider behavior. CI is configured to run disposable-PostgreSQL E2E and build all Docker targets, but no CI run is claimed.
+- On 2026-10-29, [GitHub Actions run 40830435834](https://github.com/rafieiseyedmeisam-1375/venturelens/actions/runs/40830435834) passed for commit `35b6967`: locked installation, lint/type/format checks, unit coverage, web/worker builds, migration and synthetic administrator setup against disposable PostgreSQL 17.11, all 20 Playwright tests, and all three Docker image builds. These tests validate the existing foundation, not the pending hosted-authentication contract.
+- Added a Docker runtime smoke job covering migrations, readiness transitions, non-root execution, worker startup, and graceful shutdown. Execution evidence will be recorded after its first CI run.
+
+**Unavailable here:** Docker is not installed locally; no Supabase credentials were supplied. Docker image execution, Supabase roles/Storage, and Darkube deployment have not yet been verified. Local/CI PostgreSQL tests do not establish Supabase role, TLS, or cross-provider behavior. CI builds do not publish images or deploy the application.
 
 Downloaded upstream research/archive files and obsolete template assets were removed. Portable Node/Git and npm cache remain ignored under `.tools/`. On 2026-10-29, foundation commit `ceed39f` was pushed to the public [VentureLens repository](https://github.com/rafieiseyedmeisam-1375/venturelens). Local `main` tracks `origin/main`; fetch and push use that repository. This establishes repository connectivity, not successful CI or Darkube deployment. Original root specification paths remain as links into the canonical `docs/` structure.
