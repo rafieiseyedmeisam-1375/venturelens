@@ -1,6 +1,6 @@
 # Foundation implementation status
 
-**Updated:** 2026-10-28. The boilerplate installation and adaptation milestone is complete. This is a development starting point, not a completed VentureLens MVP or confidential-production release.
+**Updated:** 2026-10-29. The boilerplate installation and adaptation milestone is complete. This is a development starting point, not a completed VentureLens MVP or confidential-production release.
 
 ## Installed/adapted
 
@@ -36,4 +36,4 @@ Verified on Windows with portable Node 24.22.1 and npm 11.19.1:
 
 **Unavailable here:** Docker is not installed; no Supabase credentials were supplied. Actual account/session flows, database-backed Playwright E2E, Docker image execution, Supabase roles/Storage, and Darkube deployment have not been exercised. The local PostgreSQL test does not establish Supabase role, TLS, or cross-provider behavior. CI is configured to run disposable-PostgreSQL E2E and build all Docker targets, but no CI run is claimed.
 
-Downloaded upstream research/archive files and obsolete template assets were removed. Portable Node/Git and npm cache remain ignored under `.tools/`. A local Git repository has been initialized on `main`; it has not been committed or connected to a GitHub remote because the GitHub integration is not connected in this session. Original root specification paths remain as links into the canonical `docs/` structure.
+Downloaded upstream research/archive files and obsolete template assets were removed. Portable Node/Git and npm cache remain ignored under `.tools/`. On 2026-10-29, foundation commit `ceed39f` was pushed to the public [VentureLens repository](https://github.com/rafieiseyedmeisam-1375/venturelens). Local `main` tracks `origin/main`; fetch and push use that repository. This establishes repository connectivity, not successful CI or Darkube deployment. Original root specification paths remain as links into the canonical `docs/` structure.
