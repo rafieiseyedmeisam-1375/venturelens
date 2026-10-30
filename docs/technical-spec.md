@@ -1,10 +1,10 @@
 # VentureLens AI — Technical Specification
 
-**Version:** 1.2 — user-supplied visual design reference  
-**Date:** 2026-10-22  
+**Version:** 1.3 — consolidated development contracts  
+**Date:** 2026-10-29  
 **Target:** Dockerized web/worker deployment on Hamravesh Darkube; Supabase Free PostgreSQL and Storage; multiple authenticated evaluators in one shared workspace.  
 **Status:** Engineering design baseline. Deployment-specific values and product-policy approvals identified below remain release gates; this document does not assert that software has been implemented or deployed.  
-**Product baseline:** [Product specification v1.4](product-spec.md) and [design scope](design-scope.md), amended by the user's hosted/shared-workspace decisions of 2026-10-21.  
+**Product baseline:** [Product specification v1.5](product-spec.md) and [design scope](design-scope.md), incorporating the user's hosted/shared-workspace decisions of 2026-10-21.  
 **Starter:** [mhp-nextjs-boilerplate](https://github.com/amirmhp98/mhp-nextjs-boilerplate/tree/a6228062889af58805fba519cd2c00331808893d), audited at `a6228062889af58805fba519cd2c00331808893d`.  
 **Companions:** [Source investigation](boilerplate-investigation.md), [Darkube deployment and operations](darkube-deployment.md).
 
@@ -33,6 +33,8 @@
 19. [Delivery sequence and open gates](#19-delivery-sequence-and-open-gates)
 
 ## 1. Scope, authority, and decisions
+
+The [development readiness contract](development-readiness.md) fixes schema ownership, save behavior, idempotency, lock order and synthetic development defaults. It refines this specification; it does not approve production rubric policy, provider terms or cloud acceptance. Task-owned migrations must introduce referenced tables before foreign keys and dependent services.
 
 ### 1.1 Requirements hierarchy
 
@@ -108,7 +110,7 @@ flowchart TB
 
 Darkube documents Docker-image applications, command/argument overrides, HTTP readiness probes, and separate background-worker deployment. It hosts the application processes, while Supabase hosts persistence in its selected region. Connectivity crosses provider boundaries; a shared private cluster/network must not be assumed. [Docker settings](https://docs.hamravesh.com/products/darkube/create/docker-image/settings/general), [worker deployment](https://docs.hamravesh.com/products/darkube/getting-started).
 
-Use Supabase Storage's S3-compatible API behind the existing storage adapter. Generated S3 keys are server-only, project-wide credentials that bypass Storage RLS; they are not bucket-scoped credentials. Authorization remains in VentureLens services and guarded file routes. Never send these keys to browsers or parser children. [Supabase S3 authentication](https://supabase.com/docs/guides/storage/s3/authentication).
+Implement the storage adapter using Supabase Storage's S3-compatible API; no storage adapter exists in the foundation. Generated S3 keys are server-only, project-wide credentials that bypass Storage RLS; they are not bucket-scoped credentials. Authorization remains in VentureLens services and guarded file routes. Never send these keys to browsers or parser children. [Supabase S3 authentication](https://supabase.com/docs/guides/storage/s3/authentication).
 
 ### 2.2 Initial capacity envelope
 
@@ -147,7 +149,7 @@ Use **Node.js 24 LTS**, with exact patch and Docker digest pinned at foundation 
 | UI primitives, form fields, messages, RTL utilities | Keep; add evidence viewer, financial fields, conflict comparison, review controls                                                                   |
 | Dark default, theme switch, Yekan Bakh              | Replace with the light visual direction in `design.md`; DPSans/DPSansEn when available with appropriate rights, locally packaged Vazirmatn fallback |
 | Generic error envelope                              | Extend with stable code, retry semantics, request ID, and revision conflict details                                                                 |
-| Module generator                                    | Fix route-group destination; remove generic destructive deletion as a domain default                                                                |
+| Module generator                                    | Already removed. Add modules manually with domain-specific lifecycle rules; do not restore generic destructive generation.                          |
 | Logger                                              | Replace arbitrary error-object logging with safe structured projections                                                                             |
 | Health endpoint                                     | Split process liveness, app readiness, and authenticated dependency status                                                                          |
 | Dockerfile                                          | Adapt into explicit web, worker, migration targets with matching release ID                                                                         |
@@ -188,7 +190,7 @@ deploy/                            future Docker/launch/release assets
 
 Dependency direction: UI → actions or DTOs; pages → services; actions/routes → access policy + services; services → domain + adapters; worker → services/domain/adapters. Domain code MUST NOT import Next.js, React, Prisma, environment globals, or translation messages. Adapters return typed records/errors, not UI components.
 
-Separate worker-safe environment/database factories from Next's `server-only` wrappers. A direct Node worker must start without mocked imports. The generator and ESLint rules must enforce the new directories, including imports into client-marked route files; filename-based exemptions alone are insufficient. Use DTO projections to avoid leaking password/session/provider fields to client components.
+Separate worker-safe environment/database factories from Next's `server-only` wrappers. A direct Node worker must start without mocked imports. ESLint rules must enforce the new directories, including imports into client-marked route files; filename-based exemptions alone are insufficient. The unsafe generic module generator was removed; add modules manually using the Users structure, without copying its incomplete security controls. Use DTO projections to avoid leaking password/session/provider fields to client components.
 
 ## 5. Identity and shared-workspace permissions
 
@@ -572,7 +574,7 @@ Approval does not require every domain to have a score or every gap to be resolv
 
 Report preparation creates an immutable render manifest from exact snapshot/run/review/opinion/approval IDs. Persist the Persian rendered HTML, stylesheet/assets/font references or embedded assets, template version, content hash, labels, and generation timestamp in private object storage. Downloads never re-render old reports using current startup fields or rubric messages.
 
-Use the existing sixteen-section report content: cover, startup context, opinion, evidence sufficiency/limitations, six domains, risks, conflicts/scenarios, gaps/questions, next actions, citations, and approval attribution. Include stage/jurisdiction/rubric context and summarize exclusions without reproducing excluded content.
+Use the product specification §15.1's ten content groups as the canonical report outline; its six-domain detail group contains six domain subsections. Include cover/startup context, opinion, scope/evidence limitations, overview, domain details, risks, conflicts/scenarios, gaps/questions, next actions, citations/calculation notes and approval attribution. Section counting is not a separate requirement. Include stage/jurisdiction/rubric context and summarize exclusions without reproducing excluded content.
 
 Report labels have independent axes: Draft/Approved, Incomplete if technical work is unfinished, Provisional if evidence limitations apply. Draft/Incomplete must appear on every printed page; list unfinished sections and use Not analyzed or Opinion unavailable—analysis incomplete where appropriate. Record a new ReportVersion after recovery; old incomplete artifacts retain their identity.
 

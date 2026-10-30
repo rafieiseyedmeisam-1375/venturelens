@@ -20,6 +20,13 @@
 - Actual Darkube acceptance, private registry configuration, image digest/SBOM checks, operational monitoring.
 - Resolve or explicitly review the Prisma CLI dependency advisory recorded in [dependency review](dependency-review.md).
 
+## Planning readiness — 2026-10-29
+
+- Added the [implementation plan](implementation-plan.md), [development readiness contract](development-readiness.md), [rubric review candidate](rubric-review.md), and [decision 009](decisions/009-development-readiness.md).
+- Consolidated active product/technical/design documents to remove stale single-user/local-only/no-login/generator/report-outline contradictions. Fixed plan schema creation order and made the correction path available alongside snapshot locking.
+- Selected synthetic test-only AI, disabled live paid execution and unconfigured legal jurisdiction as explicit development defaults. These do not establish cloud/provider readiness or approve a rubric.
+- No application feature milestone was completed by this documentation work. Product-owner rubric approval and actual operational/quality acceptance remain recorded gates, not automatically passed checks.
+
 ## Validation record
 
 Verified on Windows with portable Node 24.22.1 and npm 11.19.1:

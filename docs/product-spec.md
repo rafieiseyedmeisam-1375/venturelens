@@ -1,19 +1,19 @@
 # VentureLens AI — Product Specification
 
-> **Hosted scope amendment — 2026-10-21:** The user has selected Dockerized application deployment on Hamravesh Darkube, **Supabase Free for database and object storage**, and **multiple authenticated evaluators in one shared workspace**. [Technical specification](technical-spec.md) §1 explicitly supersedes this document's earlier local-only, single-evaluator, no-login, and local-storage assumptions. Its product rules remain the baseline; proposed scoring policy still requires approval. Read historical operating-model statements below subject to this amendment.
+> **Hosted scope decision — 2026-10-21, consolidated 2026-10-29:** The user selected Dockerized application deployment on Hamravesh Darkube, **Supabase Free for database and object storage**, and **multiple authenticated evaluators in one shared workspace**. The active requirements below now incorporate that decision. Historical versions do not override it. Proposed scoring policy still requires approval; see [candidate R0](rubric-review.md) and the [development readiness contract](development-readiness.md).
 
-**Version:** 1.4 — design consistency and usability clarification  
-**Updated:** 2026-10-18  
+**Version:** 1.5 — consolidated hosted development baseline  
+**Updated:** 2026-10-29  
 **Product:** VentureLens AI  
 **Tagline:** From Startup Data to Investment Intelligence  
 **Category:** Evidence-based startup due diligence and investment assessment  
 **Document language:** English  
 **Application and report language:** Persian, RTL by default  
-**Operating model:** One evaluator, local application, authorized confidential startup documents, external AI API  
+**Operating model:** Multiple authenticated evaluators in one shared workspace; Darkube web/worker, Supabase PostgreSQL/private Storage, explicitly authorized external AI processing  
 **Status:** Product scope agreed; proposed rubric and operational defaults require validation before the relevant implementation or confidential-data pilot. This document does not claim that scoring is implementation-ready.  
 **Authority:** This is the current specification. It supersedes `product-spec-v1.1.md`, which is retained as the historical baseline.
 
-**Design companion:** [design-scope.md](design-scope.md) defines the concise screen, action, state, and journey inventory for design. This specification remains authoritative for product rules. Version 1.4 aligns content selection, assessment context, result states, and incomplete reports across both documents without adding screens or relaxing input immutability, evidence requirements, or human approval.
+**Design companion:** [design-scope.md](design-scope.md) defines the concise screen, action, state, and journey inventory for design. This specification remains authoritative for product rules. Version 1.5 consolidates the hosted operating model while preserving the input immutability, evidence, review, content selection and report requirements established in v1.4.
 
 ---
 
@@ -67,7 +67,7 @@ These decisions were selected by the product owner during clarification. Propose
 | D10 | For contradictory evidence, assess alternative scenarios and preserve the conflict until human review resolves it.                                                                                                 |
 | D11 | New documents or factual corrections after analysis require a separate assessment created by the evaluator. Preserve the previous assessment and its input snapshot.                                               |
 | D12 | A successor assessment copies prior documents and factual inputs, but generates fresh findings, scores, and an opinion requiring new approval.                                                                     |
-| D13 | The MVP serves one evaluator using real confidential startup documents locally. Multiuser accounts are outside the first release.                                                                                  |
+| D13 | The MVP serves multiple authenticated evaluators in one shared workspace on Darkube and Supabase. All active evaluators can view workspace evidence; no tenant switching or public signup.                         |
 | D14 | An external AI API may process documents the evaluator is authorized to share, under defined data-handling rules.                                                                                                  |
 | D15 | Retain PDF, PPTX, XLSX, essential manual inputs, evidence review, six-domain scoring, risks, gaps, draft verdicts, approval, and Persian reports. Defer extensive questionnaires, dark mode, and dashboard extras. |
 
@@ -82,7 +82,7 @@ These decisions were selected by the product owner during clarification. Propose
 
 ### 3.1 Primary user
 
-One evaluator creates assessments, reviews evidence and findings, and approves reports. The same person may perform both analysis and review; two-person approval is not required. Configure an evaluator display name for report attribution. Without individual accounts, that attribution is a local record, not independently authenticated identity.
+Authenticated evaluators create assessments, review evidence and findings, and approve reports in one shared workspace. The same evaluator may perform both analysis and approval; two-person approval is not required. All active evaluators can view workspace evidence. Administrators additionally manage accounts, global configuration and global purge. Approval records the authenticated actor ID and a frozen display name; later account-name changes do not rewrite attribution.
 
 The report may be read by an investment manager or committee outside the application. Report readers do not require application accounts in the MVP. Founders do not upload documents or respond through a portal.
 
@@ -95,12 +95,13 @@ The report may be read by an investment manager or committee outside the applica
 - AI analysis, human finding review, risk/gap management, and final opinion approval.
 - Assessment succession by copying previous documents and factual inputs.
 - Persian report preview and browser Print-to-PDF, including clearly marked draft exports.
-- Local persistence, recovery, deletion controls, and confidential-data safeguards appropriate to the operating mode.
+- Private cloud persistence, independent backup/recovery, scoped deletion, and hosted confidential-data safeguards.
+- Login, forced password change/session recovery, and administrator account management; no public signup.
 - Responsive, accessible Persian RTL workflows in light mode.
 
 ### 3.3 Deferred or excluded
 
-- Multiuser accounts, organizations, subscriptions, shared review assignments, and enterprise deployment.
+- Multiple workspaces/tenant switching, organizations, subscriptions, shared review assignments, and enterprise-specific features. Shared-workspace accounts are included.
 - Investor mandates, portfolio matching, deal valuation, and an overall composite numerical score.
 - Founder portals, CRM integrations, autonomous external research, and automatic verification of external claims.
 - Source-code auditing, comprehensive financial modeling, legal certification, or autonomous investment action.
@@ -283,13 +284,13 @@ Keep selection inside the file list and source viewer on Documents & Inputs:
 
 Validate these defaults with representative documents before release; expose actual enforced limits in the upload UI.
 
-| Limit                      | Proposed default                                       |
-| -------------------------- | ------------------------------------------------------ |
-| File size                  | 25 MB per file                                         |
-| Assessment document set    | 20 files and 100 MB total                              |
-| PDF/PPTX size              | 200 pages or slides per file                           |
-| XLSX size                  | 20 worksheets and 100,000 populated cells per workbook |
-| Active assessment analysis | One run at a time in the local workspace               |
+| Limit                      | Proposed default                                             |
+| -------------------------- | ------------------------------------------------------------ |
+| File size                  | 25 MB per file                                               |
+| Assessment document set    | 20 files and 100 MB total                                    |
+| PDF/PPTX size              | 200 pages or slides per file                                 |
+| XLSX size                  | 20 worksheets and 100,000 populated cells per workbook       |
+| Active assessment analysis | One logical assessment run at a time in the shared workspace |
 
 Limit violations must be reported before external processing where possible. Never silently truncate input to meet a model context limit. Use explicit selection, chunking with coverage tracking, or an actionable limit error. Document archive expansion, parser memory, and decompression limits must also be bounded and validated by engineering.
 
@@ -645,20 +646,20 @@ API secrets remain server-side. Keep timeout, retry, token/context limits, and c
 
 ## 16. Security, Privacy, Retention, and Deletion
 
-Real confidential startup documents are an intended MVP use case. Labeling the application local does not remove the need for baseline controls or external-processing disclosure.
+Real confidential startup documents are an intended hosted MVP use case. Development uses synthetic fixtures until the selected hosting, storage, backup and provider controls have passed the applicable acceptance gates.
 
-### 16.1 Local access and storage
+### 16.1 Hosted access and storage
 
-- Bind the app/API to loopback by default. Do not expose it on a LAN or public interface in the MVP.
-- No multiuser login is required, but local API access must be restricted to the intended application session/origin; protect against cross-origin access and unintended local requests.
-- Store uploads outside public static paths; use opaque identifiers, safe filenames, controlled download access, and path traversal prevention.
-- Restrict filesystem access to the intended OS user. Define and validate the supported encryption-at-rest approach, including whether it relies on configured OS/disk encryption, before confidential pilot use.
+- Local development binds to loopback. Hosted web ingress uses canonical HTTPS; the container listens on the configured ingress interface. The worker has no public business endpoint.
+- Require application-owned cookie authentication and explicit authorization for every sensitive page read, action, API, source and report route. Enforce same-origin/CSRF protections and shared-workspace parent relationships.
+- Store immutable originals and artifacts in private Supabase Storage with opaque keys and authenticated application downloads. Container disk is bounded temporary processing space, not durable storage.
+- Verify database, object and independent-backup encryption at rest, access controls and cross-provider TLS before confidential use. Separate runtime and migration credentials; do not expose the application schema through Supabase Data APIs. Follow technical specification §§5 and 14–17.
 - Keep credentials out of browser assets, source-controlled files, reports, and logs. Do not send the provider API key from the browser.
 - Bound parser resources and disable macros, active content, and external-reference execution.
 
 ### 16.2 External AI processing
 
-- Explain the selected provider and what will leave the computer before the first transmission for an input snapshot.
+- Explain the selected provider and the selected content leaving the hosted workspace before the first transmission for an input snapshot. Cloud storage on upload and external AI transmission are separate disclosures.
 - Send only content needed for the assessment and necessary context; avoid full-document upload when selected text/tables suffice.
 - Record the evaluator's confirmation that they are authorized to share the selected documents. This is not a claim that the software has legally verified that authority.
 - Verify the actual provider/account data-use, retention, and deletion behavior before using confidential files. Do not promise zero retention or no training based solely on local configuration names.
@@ -667,7 +668,7 @@ Real confidential startup documents are an intended MVP use case. Labeling the a
 
 ### 16.3 Retention and deletion — proposed defaults
 
-- Retain local assessments until the evaluator explicitly deletes them; display this policy and storage location. No undisclosed telemetry or automatic cloud backup.
+- Retain assessments until an authorized administrator explicitly purges them; evaluators may detach inputs from editable drafts. Disclose cloud location, shared visibility, daily independent backups and retention boundaries. Backups follow technical specification §17; no undisclosed telemetry is permitted.
 - Delete temporary parser files after processing and remove expired abandoned temporary data on restart.
 - Before analysis, deleting an input removes it from the draft and associated draft-derived content.
 - Locked assessments preserve their sources during normal use. To remove a confidential source from history, provide a deliberate purge flow that identifies every affected assessment, report, and copied reference.
@@ -675,7 +676,7 @@ Real confidential startup documents are an intended MVP use case. Labeling the a
 - Shared source storage may be deduplicated, but ordinary removal from one draft must not corrupt another assessment. A global purge must disclose its full impact.
 - Archive hides a record; it does not delete it. Confirm destructive actions and report completion or failures accurately.
 - Label draft removal **Remove from this draft** and global erasure **Purge stored copies**. Place purge in the data-management controls, not as the ordinary file-list remove action. Preview affected files, assessments, stored report versions, and derived data before confirmation; state which historical results will become unavailable. A cancelled purge changes nothing. A partial failure lists what remains and offers retry; do not show a successful-deletion message until the promised scope is removed.
-- Local deletion cannot recall exported copies or guarantee provider-side deletion. Explain those boundaries and any available provider-specific process.
+- Operational deletion cannot recall exported copies or guarantee provider-side deletion. Track independent-backup retention separately and replay the independent purge journal before restored data becomes accessible.
 - The normal immutability guarantee excludes explicit deletion/purge. Do not retain confidential content solely to preserve an audit history against an explicit deletion request.
 
 ## 17. UX, Localization, and Accessibility
@@ -819,7 +820,7 @@ Enforce referential integrity and explicit ownership. Do not use a single assess
 
 ### 19.2 Implementation direction, not an instruction to begin development
 
-The prior stack remains a suitable starting hypothesis: React/TypeScript/Vite, accessible reusable UI components, a Node.js/TypeScript backend, SQLite with migrations for local persistence, server-side AI adapter, and HTML print reporting. Choose parser libraries through format/provenance evaluation. Avoid mandatory microservices, unnecessary charts, or a generic workflow engine for this MVP.
+The selected stack is the existing Next.js App Router/React/TypeScript/Tailwind foundation, application cookie sessions, Prisma with Supabase PostgreSQL in the dedicated `venturelens` schema, private Supabase Storage, a separate Node worker, and immutable HTML/browser-print reports on Darkube. The former Vite/SQLite/local-only hypothesis is retired. Preserve the existing services/actions/UI pattern and implement the remaining delta in [implementation-plan.md](implementation-plan.md).
 
 Keep domain policy, evidence/scoring calculations, orchestration, storage, and UI separate. Record secrets only in the server environment. Use typed schemas for manual forms, provider outputs, and shared entities. Exact libraries, versions, model selection, deployment packaging, and migration mechanics belong in the later implementation plan.
 
@@ -850,7 +851,7 @@ This specification replaces the previous coding-agent command section with produ
 | A17 | Resolve or retain a material conflict during review                            | Record rationale and review revision; unresolved scenario limitations remain visible; new evidence uses a successor assessment.                                                                                                                                                                                                                                                                                        |
 | A18 | Mark a risk accepted or a gap resolved                                         | Acceptance does not hide the risk; gap resolution requires qualifying evidence; new uploads do not auto-resolve historical gaps.                                                                                                                                                                                                                                                                                       |
 | A19 | Upload prompt-injection content or unsafe rendered text                        | Documents cannot change policy, reveal secrets, trigger remote actions, mark approval, or bypass validation.                                                                                                                                                                                                                                                                                                           |
-| A20 | Purge a source shared across assessments                                       | Show affected scope and remove targeted local derived data/caches/artifacts; ordinary draft removal does not corrupt other records. Explain exported/provider-copy limits.                                                                                                                                                                                                                                             |
+| A20 | Purge a source shared across assessments                                       | Show affected scope and remove targeted operational derived data/caches/artifacts; ordinary draft removal does not corrupt other records. Explain exported/provider-copy limits.                                                                                                                                                                                                                                       |
 | A21 | Use the app at target widths and with a keyboard                               | Persian text and controls remain usable, focus is visible, statuses are accessible, and source-table scrolling is contained.                                                                                                                                                                                                                                                                                           |
 | A22 | Exceed file, context, time, or cost limits                                     | Explain the limit and next action; do not silently truncate evidence or fabricate a completed assessment.                                                                                                                                                                                                                                                                                                              |
 | A23 | Start with fully answered forms but weak evidence                              | Separate question completion from preliminary evidence sufficiency; preview known gaps without promising scores; allow analysis with honest limits.                                                                                                                                                                                                                                                                    |
@@ -883,7 +884,7 @@ No further long clarification questionnaire is required. Use the concrete propos
 | P0       | Scoring rubric                   | Compact criterion catalog proposed; complete stage-specific 1–5 anchors, essential criteria, evidence quality/freshness, and examples.    | Product-owner approval before scoring implementation.                                |
 | P0       | Coverage and aggregation         | Proposed 60% coverage, all essential criteria, at least half of applicable criteria, equal weights. Validate with realistic sparse cases. | Rubric approval.                                                                     |
 | P0       | Opinion and risk policy          | Proposed verdict meanings and severity anchors; validate provisional verdicts and contradictory-scenario outcomes.                        | Before real assessment conclusions are accepted as product output.                   |
-| P0       | Confidential-data controls       | Provider/account terms, local storage protection, authorization disclosure, access boundaries, retention/deletion.                        | Before the confidential-data pilot; unvalidated prototype uses redacted/sample data. |
+| P0       | Confidential-data controls       | Provider/account terms, hosted storage protection, authorization disclosure, access boundaries, retention/deletion.                       | Before the confidential-data pilot; unvalidated prototype uses redacted/sample data. |
 | P0       | Jurisdiction                     | Initial jurisdiction and any relevant exceptions remain unspecified. Do not infer them from city or language.                             | Before jurisdiction-dependent Legal scoring.                                         |
 | P1       | File and scenario limits         | Support matrix, no OCR, 25 MB/file, 20 files, scenario complexity boundary are proposed.                                                  | Parser/scenario feasibility and representative-document review.                      |
 | P1       | Cost/time budgets                | Proposed time limits; monetary budget and selected model/provider configuration remain to be measured and set.                            | Before paid pilot runs.                                                              |
@@ -898,7 +899,7 @@ The product owner approves policy; engineering validates feasibility and impleme
 This sequence guides later implementation; it is not an instruction to start coding as part of this document update.
 
 1. Validate the compact rubric, evidence rules, opinion policy, and evaluation examples.
-2. Confirm local confidential-data operating controls and document support limits using nonconfidential fixtures.
+2. Confirm hosted confidential-data operating controls and document support limits using nonconfidential fixtures.
 3. Build persistence, startup/assessment lifecycle, essential forms, and all three document extraction paths.
 4. Implement evidence provenance, claim conflicts, scenarios, score eligibility, and deterministic aggregation.
 5. Integrate bounded AI analysis and recovery; evaluate real outputs against reviewed cases.
@@ -909,6 +910,12 @@ This sequence guides later implementation; it is not an instruction to start cod
 The MVP is complete when the approved policy is represented faithfully, all applicable acceptance scenarios pass, blocking quality/security failures are resolved, the evaluator can produce and approve a traceable Persian report using real authorized inputs, and a successor assessment can incorporate new information without rewriting history. Deferred features are not required for completion.
 
 ## 23. Change History
+
+### 23.4 Version 1.5 — hosted baseline consolidation
+
+- Replaced contradictory single-user/local-only/no-login/Vite/SQLite directions with the already-selected hosted/shared-workspace architecture.
+- Aligned access, attribution, private storage, independent backups and scoped deletion with the technical specification.
+- Added the [development readiness contract](development-readiness.md) to distinguish executable development defaults from measured release acceptance. No cloud acceptance or scoring-policy approval is implied by this consolidation.
 
 ### 23.1 Version 1.4 — design consistency and usability
 

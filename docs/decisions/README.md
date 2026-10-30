@@ -2,6 +2,8 @@
 
 **VentureLens:** [008 — foundation adoption](008-venturelens-foundation.md) is the current setup decision. Records 001–007 preserve upstream history; current product/technical/design specifications supersede conflicting template defaults, especially optional agent tooling and the first-session workflow.
 
+[009 — development readiness](009-development-readiness.md) consolidates active specifications and defines implementation defaults and gate boundaries. It does not approve candidate scoring policy or certify hosted acceptance.
+
 Short notes on the choices that shape this codebase, so adopters and agents do not re-litigate
 them. One file per decision, a paragraph or two each. Add a new one when you change a rule.
 
@@ -14,3 +16,5 @@ them. One file per decision, a paragraph or two each. Add a new one when you cha
 | [005](005-lint-enforced-layering.md)            | Architecture rules are ESLint rules, not prose                   |
 | [006](006-agent-config-in-repo.md)              | Agent configuration and skills are committed                     |
 | [007](007-first-session-defines-the-product.md) | The first agent session defines the product before building      |
+| [008](008-venturelens-foundation.md)            | Adopt the existing VentureLens foundation                        |
+| [009](009-development-readiness.md)             | Resolve documentation conflicts and fix development contracts    |

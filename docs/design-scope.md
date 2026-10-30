@@ -2,7 +2,7 @@
 
 > **Hosted scope amendment — 2026-10-21:** Retain the nine business screen templates below and add login, password change/session recovery, and administrator account management for **multiple evaluators sharing one workspace**. [Technical specification](technical-spec.md) §§5, 7, and 13 govern permissions, concurrent edits, and the added account surfaces. Earlier local-only/no-login assumptions are superseded.
 
-**Updated:** 2026-10-18 · **Reference:** [product-spec.md](product-spec.md), v1.4  
+**Updated:** 2026-10-29 · **Reference:** [product-spec.md](product-spec.md), v1.5  
 **Scope:** 9 screen templates, shared panels/dialogs, 1 printable report layout. Persian RTL, light mode, desktop and mobile. This is the concise design inventory; the product specification governs business rules and proposed defaults.
 
 **Visual reference — adopted 2026-10-22:** [design.md](../design.md) is the user-supplied visual design reference, preserved unchanged from `mci.ir-DESIGN.md`. Use its blue/orange palette, light surfaces, rectilinear geometry, spacing, typography direction, and restrained elevation for future VentureLens UI designs. It supersedes the earlier visual palette/spacing defaults, while this document continues to define screens and interactions. The MCI name, telecom content, and imagery describe the source reference; VentureLens retains its own identity and product content.
@@ -118,6 +118,6 @@ Keep context and content details expandable within existing screens. Start uses 
 
 **Design at 375px and desktop, verify at 768/1280/1440px.** Include keyboard focus, readable contrast, non-color status labels, and contained scrolling for wide evidence tables.
 
-**Excluded:** login/multiuser screens, founder portal, dark mode, advanced dashboards, portfolio comparison, automated assessment-diff tools, and extensive questionnaires. No additional full-page readiness, analysis-progress, or approval wizard is needed.
+**Excluded:** founder portal, tenant switching, dark mode, advanced dashboards, portfolio comparison, automated assessment-diff tools, and extensive questionnaires. Login, password change/session recovery and account management are included by the hosted amendment. No additional full-page readiness, analysis-progress, or approval wizard is needed.
 
 **Review checks:** Walk through sparse evidence, a misread financial value, an unresolved conflict, a failed run, a changed approved opinion, a shared-source purge, content exclusions/hidden sheets, unknown or changed assessment context, applicability states, and incomplete export/recovery. Every case must expose the consequence before commitment and provide a clear next action without adding a mandatory page or losing entered work. Use acceptance scenarios A23–A34 in the product specification and the Persian terminology in Section 17.4.

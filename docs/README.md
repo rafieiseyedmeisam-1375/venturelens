@@ -16,6 +16,13 @@
 
 The latest user requirements take precedence. Product rules govern behavior, technical specifications govern implementation, and the design reference governs visual direction subject to accessibility and product scope. A specification is not proof of implementation.
 
+## Development handoff
+
+- [Implementation plan](implementation-plan.md): 10 phases and 42 tasks grounded in the existing repository.
+- [Development readiness](development-readiness.md): resolved contradictions, explicit defaults, schema ownership and remaining activation evidence.
+- [Rubric review packet](rubric-review.md): concrete candidate R0, with its explicit owner-approval state.
+- [Decision 009](decisions/009-development-readiness.md): consolidation rationale and authorization boundaries.
+
 ## Audit and history
 
 - [Boilerplate investigation](boilerplate-investigation.md): pinned-source findings.

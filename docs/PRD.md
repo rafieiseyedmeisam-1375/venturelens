@@ -30,3 +30,7 @@ Darkube runs Dockerized Next.js web and Node worker processes; Supabase Free sup
 6. Collaborative review/approval, immutable reports, purge, and restore drill.
 
 Framework anchors, provider selection/budgets, and actual cloud configuration remain explicit gates. Do not fabricate scores, completed workflows, or deployment evidence to fill missing implementation.
+
+## Development handoff
+
+Use the [implementation plan](implementation-plan.md) and [development readiness contract](development-readiness.md). Development starts with synthetic AI fixtures, paid execution disabled and jurisdiction not configured; these are explicit defaults, not missing startup prerequisites. [Rubric candidate R0](rubric-review.md) supplies a concrete scoring-policy review package; its approval status is recorded there. Actual cloud, provider, recovery and expert-quality evidence is required before enabling the corresponding live capability.
